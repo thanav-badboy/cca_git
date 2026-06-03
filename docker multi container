@@ -1,0 +1,32 @@
+Run Multiple Containers using Docker Compose
+We will run:
+Web server (nginx) 
+Another container (same image) 
+Step 1 — Create docker-compose.yml
+		notepad docker-compose.yml
+Write this and save it.
+version: '3'
+services:
+  web1:
+    image: nginx
+    ports:
+      - "8081:80"
+  web2:
+    image: nginx
+    ports:
+      - "8082:80"
+
+Step 2 — Run Compose (up)
+docker-compose up -d
+Step 3 — Check running containers
+docker ps
+Step 4 — Verify in browser
+Open:
+http://localhost:8081
+http://localhost:8082
+Both will show nginx page
+Step 5 — Stop all containers
+docker-compose down
+
+
+
