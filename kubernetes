@@ -1,52 +1,39 @@
-Step 1: open docker desktop 
-Step 2: open settings
-Step 3: enable Kubernetes
-	Apply & restart
-	Wait for 5-10 mins
-Step 4:Open Powershell or cmd
-deploying an application (in this case, an Nginx web server) in Kubernetes 
-To test kubernetes
-kubectl get nodes  -> Lists all the worker and master machines (nodes) that make up your cluster. It shows their status (Ready/NotReady), roles, age, and Kubernetes version.
-kubectl cluster-info -> Displays the control plane connection details. It tells you where the Kubernetes master and core services (like CoreDNS) are running and if they are accessible.
-kubectl get nodes -> It lists all currently running resources in your current namespace, including pods, services, deployments, and replica sets.
+kubectl get nodes  
+kubectl cluster-info
+kubectl get nodes 
 kubectl get all
-kubectl create deployment ngnix --image=ngnix  -> This command creates a Deployment named ngnix. The deployment tells Kubernetes to pull the Nginx container image from a registry and ensure that one instance (pod) of it is running.
-kubectl get pods  -> Lists all running instances of containers (Pods) in the cluster. After running the create command, you will see a pod named something like ngnix-848cfc977b-jk68z with a status of Running or ContainerCreating.
-kubectl describe pod ngnix-848cfc977b-jk68z  -> Retrieves detailed logs and metadata about that specific pod. It is incredibly useful for troubleshooting (e.g., if the container fails to start, this shows you why).
-kubectl expose deployment ngnix --type=NodePort --port=80   ->  Creates a Kubernetes Service for your deployment. By setting the type to NodePort, Kubernetes opens a specific port on all your cluster nodes, mapping external traffic on that port directly to port 80 of your Nginx pod.
-kubectl get services   -> Lists all network services. You will see your new ngnix service here, along with its internal cluster IP and the specific NodePort (usually a random number between 30000-32767) you can use to access Nginx from your browser.
+kubectl create deployment ngnix 
+kubectl get pods  
+kubectl describe pod ngnix-848cfc977b-jk68z  
+kubectl expose deployment ngnix --type=NodePort --port=80  
+kubectl get services   
 kubectl describe deployment ngnix
-kubectl scale deployment ngnix --replicas=3   -> Tells Kubernetes to scale up your application. Instead of running just 1 Nginx pod, it will now spin up 3 identical pods to share the traffic load.
+kubectl scale deployment ngnix --replicas=3   
 kubectl delete pod ngnix-848cfc977b-ffsx8  
-kubectl get pods  -> Because you told the Deployment to maintain 3 replicas, Kubernetes will instantly realize a pod is missing and automatically spin up a brand new one to replace the one you just deleted. This showcases Kubernetes' self-healing capability.
+kubectl get pods 
 kubectl delete pod ngnix-848cfc977b-7np65
 kubectl get pods
-kubectl delete deployment ngnix   -> Deletes the ngnix Deployment. This will automatically clean up and terminate all 3 Nginx pods associated with it. (Note: The Service created via kubectl expose will still exist and would need to be deleted separately via kubectl delete service ngnix).
+kubectl delete deployment ngnix   
 kubectl get all
 
 
 Deploy an NGINX application in Kubernetes cluster and access it through browser.
-Step1: First, we create a deployment. This tells Kubernetes to download the NGINX image and run it inside a container (called a Pod).
+Step1:
+
 kubectl create deployment nginx-app --image=nginx
 kubectl get pods
-Step 2: Expose NGINX to the Outside World
-By default, your NGINX application is only accessible from inside the Kubernetes cluster. To open it up to your web browser, you need to expose it using a Kubernetes Service.
-If you are using Local Kubernetes (Minikube, Kind, Docker Desktop)
-Local setups typically don't have a built-in cloud load balancer, so we use NodePort to open a high-numbered port (between 30000-32767) on your local machine.
+
+Step 2: 
 
 kubectl expose deployment nginx-app --type=NodePort --port=80
-Step 3: Access it in Your Browser
-Now, let's get the address to type into your browser. Run this command to check the status of your service:
+
+Step 3: 
+
 kubectl get services nginx-app
-Look at the PORT(S) column. You will see something like 80:31234/TCP. The second number (31234) is your target port.
+
 For Docker Desktop: Open your browser and go to http://localhost:31234
 kubectl delete deployment nginx-app 
 kubectl delete service nginx-app
 
-meaning your Kubernetes cluster is running inside a virtualized environment on Windows (like Minikube running via VirtualBox/Hyper-V, or a remote cloud VM) rather than directly on your Windows host network.
-Because of this isolation, localhost points to your physical Windows machine, but the port 30530 is only open on the internal Kubernetes Node IP.
-Here is how to find the correct address to type into your browser, depending on what tool you used to install Kubernetes:
-If you are strictly using the Kubernetes engine built directly into Docker Desktop for Windows, localhost:30530 should usually map automatically. If it isn't working:
-Check your Windows Firewall or any active VPN software, as they frequently block local port forwarding between Windows and WSL2/Docker networks.
 kubectl port-forward deployment/nginx-app 8080:80
-Keep that terminal window open and go to http://localhost:8080 in your web browser.
+
