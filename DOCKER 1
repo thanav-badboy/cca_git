@@ -1,21 +1,18 @@
-Install docker for windows and open cmd prompt
 
-Verify docker using cmds
 docker –- version
 docker version
 docker info
 
-Pull images from docker hub
 docker pull hello-world
 docker pull Ubuntu
 docker pull nginx
 docker images
 
-Run images
+
 docker run hello-world
 docker run -it --name myubuntu ubuntu bash
 
-container
+
 docker ps –a
 docker start myubuntu
 docker exec -it myubuntu bash
@@ -25,7 +22,6 @@ docker inspect myubuntu
 docker stop myubuntu
 docker rm myubuntu
 
-port mapping with nginx
 docker run -d -p 8080:80 --name mynginx nginx
 docker port mynginx
 docker logs mynginx
@@ -33,14 +29,11 @@ docker logs mynginx
 docker stop mynginx
 docker rm mynginx
 
-create a folder and 2 files inside the folder
-1. Index.html
-2. Docker file-> with no extension
-Include this line in dockerfile
+
 FROM nginx
 COPY index.html /usr/share/nginx/html/index.html
 
-Open cmd pmt and chane to the specific dir which u have created
+
 docker build --no-cache -t myimage .
 docker images
 docker run -d -p 9091:80 --name mysite1 myimage
@@ -48,13 +41,10 @@ docker run -d -p 9091:80 --name mysite1 myimage
 	docker stop mysite1
 	docker rm mysite1
 
-Push to docker hub
 docker login
 docker tag myimage <username>/myimage
 docker push <username>/myimage
 
-
-Test from dockerhub
 docker rmi <username>/myimage
 docker pull <username>/myimage
 docker run -p 9091:80 <username>/myimage
