@@ -1,0 +1,80 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+
+data = pd.read_csv("curve.csv")
+display(data.head())
+
+X = data["x"].values
+y = data["y"].values
+
+plt.scatter(X, y)
+plt.xlabel("x")
+plt.ylabel("y")
+plt.title("Original Data")
+plt.show()
+
+def get_penalty_weights(query_x, X, tau):
+    m = X.shape[0]
+    W = np.eye(m)
+    for i in range(m):
+        x = X[i]
+        W[i, i] = np.exp(
+            np.dot((x - query_x), (x - query_x).T) / (-2 * tau * tau)
+        )
+    return W
+
+
+
+def predict(X, y, query_x, tau):
+    m = X.shape[0]
+
+    X_transformed = np.column_stack((X, np.ones(m)))
+    query_x_transformed = np.array([query_x, 1])
+
+    penalty_weights = get_penalty_weights(
+        query_x_transformed,
+        X_transformed,
+        tau
+    )
+
+    y_transformed = y.reshape(-1, 1)
+
+    theta = np.linalg.pinv(
+        X_transformed.T @ penalty_weights @ X_transformed
+    ) @ (
+        X_transformed.T @ penalty_weights @ y_transformed
+    )
+
+    prediction = query_x_transformed @ theta
+    return theta, prediction
+
+
+tau = 0.1
+
+X_test = np.sort(
+    np.random.randint(
+        1, 100,
+        size=X.shape[0]
+    )
+)
+
+predictions = []
+
+for query_instance in X_test:
+    theta, prediction = predict(
+        X, y, query_instance, tau
+    )
+    predictions.append(prediction.item())
+
+
+
+plt.figure(figsize=(8,5))
+plt.scatter(X, y, label="Actual Data")
+plt.plot(X_test, predictions, label="LWR Prediction")
+plt.xlabel("x")
+plt.ylabel("y")
+plt.title(f"Locally Weighted Regression (tau={tau})")
+plt.legend()
+plt.show()
+
